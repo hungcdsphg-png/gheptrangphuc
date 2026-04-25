@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+    <script>
+      (function() {
+        // Đặt global và process trước để đánh lừa các thư viện polyfill
+        window.global = window;
+        window.process = window.process || { env: {} };
+
+        try {
+          const originalFetch = window.fetch;
+          // Nếu fetch là chỉ có getter (không ghi được), chúng ta thử định nghĩa lại nó
+          // với một setter rỗng để ngăn chặn lỗi TypeError khi có code thực hiện window.fetch = ...
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return originalFetch; },
+            set: function() { 
+              console.warn('Hệ thống đã ngăn chặn hành vi ghi đè window.fetch. Thao tác này bị vô hiệu hóa để tránh lỗi TypeError.'); 
+            },
+            configurable: true
+          });
+        } catch (e) {
+          console.log('Thông tin: Không cần hoặc không thể định nghĩa lại fetch, sẽ tiếp tục với thiết lập mặc định.');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
