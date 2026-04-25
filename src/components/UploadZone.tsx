@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
+import { cn, optimizeImage } from '../lib/utils';
 
 interface UploadZoneProps {
   label: string;
@@ -19,12 +19,13 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
   image,
   className
 }) => {
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        onImageUpload(reader.result as string);
+      reader.onload = async () => {
+        const optimized = await optimizeImage(reader.result as string);
+        onImageUpload(optimized);
       };
       reader.readAsDataURL(file);
     }
